@@ -1,13 +1,12 @@
 from collections import defaultdict
 from rdf2vec.walkers import RandomWalker
-from rdf2vec.graph import Vertex
 import numpy as np
 from hashlib import md5
 
 class HalkWalker(RandomWalker):
-    def __init__(self, depth, walks_per_graph, 
+    def __init__(self, depth, walks_per_graph, sampler=None, 
                  freq_thresholds=[0.001]):
-        super(HalkWalker, self).__init__(depth, walks_per_graph)
+        super(HalkWalker, self).__init__(depth, walks_per_graph, sampler)
         self.freq_thresholds = freq_thresholds
         # self.lb_freq_threshold = lb_freq_threshold
 
@@ -15,19 +14,17 @@ class HalkWalker(RandomWalker):
         canonical_walks = set()
         all_walks=[]
         for instance in instances:
-            walks = self.extract_random_walks(graph, Vertex(str(instance)))
+            walks = self.extract_random_walks(graph, str(instance))
             all_walks.extend(walks)
 
         freq = defaultdict(set)
         for i in range(len(all_walks)):
             for hop in all_walks[i]:
-                freq[hop.name].add(i)
+                freq[str(hop)].add(i)
 
         for freq_threshold in self.freq_thresholds:
             uniformative_hops = set()
             for hop in freq:
-                # if len(freq[hop])/len(all_walks) > self.ub_freq_threshold:
-                #     uniformative_hops.add(hop)
                 if len(freq[hop])/len(all_walks) < freq_threshold:
                     uniformative_hops.add(hop)
 
@@ -35,10 +32,10 @@ class HalkWalker(RandomWalker):
                 canonical_walk = []
                 for i, hop in enumerate(walk):
                     if i == 0:
-                        canonical_walk.append(hop.name)
+                        canonical_walk.append(str(hop))
                     else:
-                        if hop.name not in uniformative_hops:
-                            digest = md5(hop.name.encode()).digest()[:8]
+                        if str(hop) not in uniformative_hops:
+                            digest = md5(str(hop).encode()).digest()[:8]
                             canonical_walk.append(str(digest))
                 canonical_walks.add(tuple(canonical_walk))
                 

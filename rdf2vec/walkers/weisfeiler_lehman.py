@@ -1,12 +1,12 @@
 from hashlib import md5
 from rdf2vec.walkers import RandomWalker
 from collections import defaultdict
-from rdf2vec.graph import Vertex
 
 
 class WeisfeilerLehmanWalker(RandomWalker):
-    def __init__(self, depth, walks_per_graph, wl_iterations=4):
-        super(WeisfeilerLehmanWalker, self).__init__(depth, walks_per_graph)
+    def __init__(self, depth, walks_per_graph, sampler=None, wl_iterations=4):
+        super(WeisfeilerLehmanWalker, self).__init__(depth, walks_per_graph, 
+                                                     sampler)
         self.wl_iterations = wl_iterations
     
     def _create_label(self, graph, vertex, n):
@@ -25,8 +25,8 @@ class WeisfeilerLehmanWalker(RandomWalker):
         self._inv_label_map = defaultdict(dict)
 
         for v in graph._vertices:
-            self._label_map[v][0] = v.name
-            self._inv_label_map[v.name][0] = v
+            self._label_map[v][0] = str(v)
+            self._inv_label_map[str(v)][0] = v
         
         for n in range(1, self.wl_iterations+1):
             for vertex in graph._vertices:
@@ -45,13 +45,13 @@ class WeisfeilerLehmanWalker(RandomWalker):
 
         canonical_walks = set()
         for instance in instances:
-            walks = self.extract_random_walks(graph, Vertex(str(instance)))
+            walks = self.extract_random_walks(graph, str(instance))
             for n in range(self.wl_iterations + 1):
                 for walk in walks:
                     canonical_walk = []
                     for i, hop in enumerate(walk):
                         if i == 0 or i % 2 == 1:
-                            canonical_walk.append(hop.name)
+                            canonical_walk.append(str(hop))
                         else:
                             canonical_walk.append(self._label_map[hop][n])
 

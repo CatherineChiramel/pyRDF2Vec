@@ -11,6 +11,7 @@ from sklearn.manifold import TSNE
 
 from rdf2vec.graphs import KnowledgeGraph
 from rdf2vec.walkers import RandomWalker
+from rdf2vec.samplers import UniformSampler
 from rdf2vec import RDF2VecTransformer
 
 import warnings
@@ -49,8 +50,8 @@ kg = KnowledgeGraph('sample/MUTAG/mutag.owl', label_predicates=label_predicates)
 #                          CREATING EMBEDDINGS                          #
 #########################################################################
 
-# We'll all possible walks of depth 4 (2 hops)
-random_walker = RandomWalker(2, float('inf'))
+# We'll extract all possible walks of depth 4 (2 hops)
+random_walker = RandomWalker(2, None, UniformSampler(inverse=False))
 
 # Create embeddings with random walks
 transformer = RDF2VecTransformer(walkers=[random_walker], sg=1)

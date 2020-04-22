@@ -9,6 +9,7 @@ from sklearn.utils.validation import check_is_fitted
 from gensim.models.word2vec import Word2Vec
 
 from rdf2vec.walkers import RandomWalker
+from rdf2vec.samplers import UniformSampler
 
 
 class RDF2VecTransformer():
@@ -60,7 +61,8 @@ class RDF2VecTransformer():
         `self.model.wv.get_vector(str(instance))`.
 
     """
-    def __init__(self, vector_size=500, walkers=RandomWalker(2, float('inf')),
+    def __init__(self, vector_size=500, 
+                 walkers=[RandomWalker(2, float('inf'), UniformSampler())],
                  n_jobs=1, window=5, sg=1, max_iter=10, negative=25, 
                  min_count=1):
         self.vector_size = vector_size

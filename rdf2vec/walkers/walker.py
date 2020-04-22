@@ -1,9 +1,14 @@
+from rdf2vec.samplers import UniformSampler
 
 
 class Walker():
-    def __init__(self, depth, walks_per_graph):
+    def __init__(self, depth, walks_per_graph, sampler=None):
         self.depth = depth
         self.walks_per_graph = walks_per_graph
+        if sampler is None:
+            self.sampler = UniformSampler()
+        else:
+            self.sampler = sampler
 
     def print_walks(self, graph, instances, file_name):
         walks = self.extract(graph, instances)
